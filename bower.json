@@ -1,0 +1,25 @@
+{
+  "name": "bootstrap-modal-popover",
+  "main": "bootstrap-modal-popover.js",
+  "version": "1.0.0",
+  "homepage": "https://github.com/andersonveiga/bootstrap-modal-popover",
+  "authors": [
+    "Anderson Veiga <preams.anderson@gmail.com>"
+  ],
+  "description": "Boostrap modal popover with dynamic positioning and external content",
+  "keywords": [
+    "bootstrap",
+    "popover",
+    "modal",
+    "positioning"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
