@@ -101,8 +101,8 @@
             if (this.isShown && this.options.backdrop) {
                 var doAnimate = $.support.transition && animate
 
-                this.$backdrop = $('<div class="modal-backdrop ' + animate + '" style="background:none" />')
-                    .appendTo(document.body)
+                this.$backdrop = $('<div class="modal-backdrop ' + animate + '" style="background:none;" />')
+                    .appendTo(this.$parent)
 
                 if (this.options.backdrop != 'static') {
                     this.$backdrop.click($.proxy(this.hide, this))
