@@ -38,8 +38,13 @@
 
             var pos = this.getPosition();
 
+            var elVerticalCenter = pos.top + pos.height / 2;
+            var elHorizontalCenter = pos.left + pos.width / 2;
+
+
             var actualWidth = $dialog[0].offsetWidth;
             var actualHeight = $dialog[0].offsetHeight;
+
 
             var tp;
             switch (placement) {
@@ -50,11 +55,26 @@
                     tp = {top:pos.top - actualHeight, left:pos.left + pos.width / 2 - actualWidth / 2}
                     break;
                 case 'left':
-                    tp = {top:pos.top + pos.height / 2 - actualHeight / 2, left:pos.left - actualWidth}
+                    tp = {top:elVerticalCenter - actualHeight / 2, left:pos.left - actualWidth}
                     break;
                 case 'right':
-                    tp = {top:pos.top + pos.height / 2 - actualHeight / 2, left:pos.left + pos.width}
+                    tp = {top:elVerticalCenter - actualHeight / 2, left:pos.left + pos.width}
                     break;
+            }
+
+
+            if(placement === 'left' || placement === 'right'){
+
+              //TODO: create option to detect document margins
+              //Fix overflow top
+              if(tp.top < 20)
+              {
+                tp.top = 20;
+              }
+
+              //Fix arrow
+              var arrow = $dialog.find('.arrow');
+              arrow.css('top', (elVerticalCenter-tp.top));
             }
 
             $dialog
