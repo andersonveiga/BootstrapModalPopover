@@ -93,39 +93,9 @@
             $.fn.modal.Constructor.prototype.show.call(this, arguments); // super
         },
 
-        /** todo entire function was copied just to set the background to 'none'.  need a better way */
+        // removed backdrop compatibility because we dont need it for popovers :)
         backdrop:function (callback) {
-            var that = this
-                , animate = this.$element.hasClass('fade') ? 'fade' : ''
-
-            if (this.isShown && this.options.backdrop) {
-                var doAnimate = $.support.transition && animate
-
-                this.$backdrop = $('<div class="modal-backdrop ' + animate + '" style="background:none;" />')
-                    .appendTo(this.$parent)
-
-                if (this.options.backdrop != 'static') {
-                    this.$backdrop.click($.proxy(this.hide, this))
-                }
-
-                if (doAnimate) this.$backdrop[0].offsetWidth // force reflow
-
-                this.$backdrop.addClass('in')
-
-                doAnimate ?
-                    this.$backdrop.one($.support.transition.end, callback) :
-                    callback()
-
-            } else if (!this.isShown && this.$backdrop) {
-                this.$backdrop.removeClass('in')
-
-                $.support.transition && this.$element.hasClass('fade') ?
-                    this.$backdrop.one($.support.transition.end, $.proxy(this.removeBackdrop, this)) :
-                    this.removeBackdrop()
-
-            } else if (callback) {
-                callback()
-            }
+            callback()
         }
 
     });
@@ -157,22 +127,36 @@
 
 
     $(function () {
-        $('body').on('click.modal-popover.data-api', '[data-toggle="modal-popover"]', function (e) {
-            var $this = $(this);
-            var href = $this.attr('href');
-            var $dialog = $($this.attr('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))); //strip for ie7
-            var option = $dialog.data('modal-popover') ? 'toggle' : $.extend({ remote:!/#/.test(href) && href }, $dialog.data(), $this.data());
-            option['$parent'] = $this;
+      $('body').on('click.modal-popover.data-api', '[data-toggle="modal-popover"]', function (e) {
+          var $this = $(this);
+          var href = $this.attr('href');
+          var $dialog = $($this.attr('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))); //strip for ie7
+          var option = $dialog.data('modal-popover') ? 'toggle' : $.extend({ remote:!/#/.test(href) && href }, $dialog.data(), $this.data());
+          option['$parent'] = $this;
 
-            e.preventDefault();
+          e.preventDefault();
+
+          setTimeout(function(){
+
+            var docClickEvent = function(event){
+              if($(event.target).parents().index($('#'+$dialog.attr('id'))) === -1){
+                $dialog.hide();
+                $(document).unbind('click',docClickEvent);
+              }
+            };
 
             $dialog
             .modalPopover(option)
+            .one('shown.bs.modal',function(){
+              $(document).bind('click',docClickEvent);
+            })
             .modalPopover('show')
             .one('hide', function () {
               $this.focus()
             });
-        })
+
+          },0);
+      })
     })
 
 }(window.jQuery);
