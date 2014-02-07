@@ -22,9 +22,11 @@
 
 
         getPosition:function () {
-            var $element = this.$parent;
-            return $.extend({}, ($element.offset()), {
-                width:$element[0].offsetWidth, height:$element[0].offsetHeight
+            var parentOffset = this.$parent.offset();
+            var elementOffset = this.$element.offset();
+            var finalOffset = {'top':(parentOffset.top-elementOffset.top),'left':(parentOffset.left-elementOffset.left)};
+            return $.extend({}, finalOffset, {
+                width:this.$parent[0].offsetWidth, height:this.$parent[0].offsetHeight
             });
         },
 
@@ -44,7 +46,6 @@
 
             var actualWidth = $dialog[0].offsetWidth;
             var actualHeight = $dialog[0].offsetHeight;
-
 
             var tp;
             switch (placement) {
@@ -70,11 +71,17 @@
               if(tp.top < 20)
               {
                 tp.top = 20;
+
+                if(this.$element.offset().top)
+                {
+                  tp.top = 0;
+                }
               }
 
               //Fix arrow
               var arrow = $dialog.find('.arrow');
               arrow.css('top', (elVerticalCenter-tp.top));
+
             }
 
             $dialog
@@ -141,7 +148,7 @@
         })
     }
 
-    $.fn.modalPopover.Constructor = ModalPopover
+    $.fn.modalPopover.Constructor = ModalPopover;
 
     $.fn.modalPopover.defaults = $.extend({}, $.fn.modal.defaults, {
         placement:'right',
@@ -160,11 +167,11 @@
             e.preventDefault();
 
             $dialog
-                .modalPopover(option)
-                .modalPopover('show')
-                .one('hide', function () {
-                    $this.focus()
-                })
+            .modalPopover(option)
+            .modalPopover('show')
+            .one('hide', function () {
+              $this.focus()
+            });
         })
     })
 
