@@ -105,17 +105,32 @@
      * ======================= */
 
     $.fn.modalPopover = function (option) {
-        return this.each(function () {
-            var $this = $(this);
-            var data = $this.data('modal-popover');
-            var options = $.extend({}, $.fn.modalPopover.defaults, $this.data(), typeof option == 'object' && option);
-            // todo need to replace 'parent' with 'target'
-            options['$parent'] = (data && data.$parent) || options.$parent || $(options.target);
+      return this.each(function () {
+        var $this = $(this);
+        var data = $this.data('modal-popover');
+        var options = $.extend({}, $.fn.modalPopover.defaults, $this.data(), typeof option == 'object' && option);
+        // todo need to replace 'parent' with 'target'
+        options['$parent'] = (data && data.$parent) || options.$parent || $(options.target);
 
-            if (!data) $this.data('modal-popover', (data = new ModalPopover(this, options)))
+        if (!data) $this.data('modal-popover', (data = new ModalPopover(this, options)))
 
-            if (typeof option == 'string') data[option]()
-        })
+        if (typeof option == 'string') data[option]()
+
+        //inject default behaviour to close it
+        $this.one('shown.bs.modal',function(){
+
+          setTimeout(function(){
+            var docClickEvent = function(event){
+              if($(event.target).parents().index($this) === -1){
+                $this.hide();
+                $(document).unbind('click',docClickEvent);
+              }
+            };
+            $(document).bind('click',docClickEvent);
+          },0);
+
+        });
+      })
     }
 
     $.fn.modalPopover.Constructor = ModalPopover;
@@ -136,26 +151,12 @@
 
           e.preventDefault();
 
-          setTimeout(function(){
-
-            var docClickEvent = function(event){
-              if($(event.target).parents().index($('#'+$dialog.attr('id'))) === -1){
-                $dialog.hide();
-                $(document).unbind('click',docClickEvent);
-              }
-            };
-
-            $dialog
-            .modalPopover(option)
-            .one('shown.bs.modal',function(){
-              $(document).bind('click',docClickEvent);
-            })
-            .modalPopover('show')
-            .one('hide', function () {
-              $this.focus()
-            });
-
-          },0);
+          $dialog
+          .modalPopover(option)
+          .modalPopover('show')
+          .one('hide', function () {
+            $this.focus()
+          });
       })
     })
 
