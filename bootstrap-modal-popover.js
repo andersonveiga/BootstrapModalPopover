@@ -95,7 +95,27 @@
 
         // removed backdrop compatibility because we dont need it for popovers :)
         backdrop:function (callback) {
-            callback()
+          var that = this;
+          if(that.isShown)
+          {
+            //inject default behaviour to close it
+            that.$element.one('shown.bs.modal',function(){
+              setTimeout(function(){
+                var docClickEvent = function(event){
+                  if($(event.target).parents().index(that.$element) === -1){
+
+                    e = $.Event('hide.bs.modal')
+                    that.$element.trigger(e)
+                    that.$element.hide();
+
+                    $(document).unbind('click',docClickEvent);
+                  }
+                };
+                $(document).bind('click',docClickEvent);
+              },0);
+            });
+          }
+          callback()
         }
 
     });
@@ -115,21 +135,6 @@
         if (!data) $this.data('modal-popover', (data = new ModalPopover(this, options)))
 
         if (typeof option == 'string') data[option]()
-
-        //inject default behaviour to close it
-        $this.one('shown.bs.modal',function(){
-
-          setTimeout(function(){
-            var docClickEvent = function(event){
-              if($(event.target).parents().index($this) === -1){
-                $this.hide();
-                $(document).unbind('click',docClickEvent);
-              }
-            };
-            $(document).bind('click',docClickEvent);
-          },0);
-
-        });
       })
     }
 
@@ -154,7 +159,7 @@
           $dialog
           .modalPopover(option)
           .modalPopover('show')
-          .one('hide', function () {
+          .one('hide.bs.modal', function () {
             $this.focus()
           });
       })
