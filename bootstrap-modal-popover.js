@@ -3,18 +3,10 @@
     /* MODAL POPOVER PUBLIC CLASS DEFINITION
      * =============================== */
 
-    var docClickEvent;
-
     var ModalPopover = function (element, options) {
         var that = this;
         this.options = options;
         this.$element = $(element);
-        this.$element.find('[data-dismiss="modal-popup"]').on('click', function(){
-          e = $.Event('hide.bs.modal')
-          that.$element.trigger(e)
-          that.$element.hide();
-          $(document).unbind('click',docClickEvent);
-        });
         this.options.remote && this.$element.find('.popover-content').load(this.options.remote);
         this.$parent = options.$parent; // todo make sure parent is specified
     }
@@ -106,19 +98,30 @@
           var that = this;
           if(that.isShown)
           {
+            var dismssers = that.$element.find('[data-dismiss="modal-popup"]');
+            var docClickEvent = function(event){
+              if($(event.target).parents().index(that.$element) === -1){
+                var e = $.Event('hide.bs.modal')
+                that.$element.trigger(e)
+                that.$element.hide();
+
+                $(document).unbind('click',docClickEvent);
+              }
+            };
+
+            var dismissClickEvent = function(){
+              var e = $.Event('hide.bs.modal')
+              that.$element.trigger(e)
+              that.$element.hide();
+              $(document).unbind('click',docClickEvent);
+              dismssers.unbind('click',dismissClickEvent);
+            };
+
+            dismssers.one('click', dismissClickEvent);
+
             //inject default behaviour to close it
             that.$element.one('shown.bs.modal',function(){
               setTimeout(function(){
-                docClickEvent = function(event){
-                  if($(event.target).parents().index(that.$element) === -1){
-
-                    e = $.Event('hide.bs.modal')
-                    that.$element.trigger(e)
-                    that.$element.hide();
-
-                    $(document).unbind('click',docClickEvent);
-                  }
-                };
                 $(document).bind('click',docClickEvent);
               },0);
             });
