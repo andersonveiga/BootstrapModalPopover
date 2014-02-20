@@ -3,10 +3,18 @@
     /* MODAL POPOVER PUBLIC CLASS DEFINITION
      * =============================== */
 
+    var docClickEvent;
+
     var ModalPopover = function (element, options) {
+        var that = this;
         this.options = options;
-        this.$element = $(element)
-            .delegate('[data-dismiss="modal-popup"]', 'click.dismiss.modal-popup', $.proxy(this.hide, this));
+        this.$element = $(element);
+        this.$element.find('[data-dismiss="modal-popup"]').on('click', function(){
+          e = $.Event('hide.bs.modal')
+          that.$element.trigger(e)
+          that.$element.hide();
+          $(document).unbind('click',docClickEvent);
+        });
         this.options.remote && this.$element.find('.popover-content').load(this.options.remote);
         this.$parent = options.$parent; // todo make sure parent is specified
     }
@@ -101,7 +109,7 @@
             //inject default behaviour to close it
             that.$element.one('shown.bs.modal',function(){
               setTimeout(function(){
-                var docClickEvent = function(event){
+                docClickEvent = function(event){
                   if($(event.target).parents().index(that.$element) === -1){
 
                     e = $.Event('hide.bs.modal')
@@ -158,10 +166,7 @@
 
           $dialog
           .modalPopover(option)
-          .modalPopover('show')
-          .one('hide.bs.modal', function () {
-            $this.focus()
-          });
+          .modalPopover('show');
       })
     })
 
