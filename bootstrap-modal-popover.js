@@ -117,9 +117,7 @@
 
         var docClickEvent = function(event){
           if($(event.target).parents().index($this) === -1 && $(event.target).parents().index(options.$parent) === -1){
-            var e = $.Event('hide.bs.modal');
-            $this.trigger(e);
-            $this.hide();
+            $this.modalPopover('hide');
             $(document).unbind('click', docClickEvent);
           }
         };
