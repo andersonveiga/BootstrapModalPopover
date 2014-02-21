@@ -20,7 +20,6 @@
 
         constructor:ModalPopover,
 
-
         getPosition:function () {
             var parentOffset = this.$parent.offset();
             var elementOffset = this.$element.offset();
@@ -31,6 +30,8 @@
         },
 
         show:function () {
+            // $(document).unbind('click',this.docClickEvent);
+            this.$element.hide();
             var $dialog = this.$element;
             $dialog.css({ top:0, left:0, display:'block', 'z-index':1050 });
 
@@ -95,37 +96,6 @@
 
         // removed backdrop compatibility because we dont need it for popovers :)
         backdrop:function (callback) {
-          var that = this;
-          if(that.isShown)
-          {
-            var dismssers = that.$element.find('[data-dismiss="modal-popup"]');
-            var docClickEvent = function(event){
-              if($(event.target).parents().index(that.$element) === -1){
-                var e = $.Event('hide.bs.modal')
-                that.$element.trigger(e)
-                that.$element.hide();
-
-                $(document).unbind('click',docClickEvent);
-              }
-            };
-
-            var dismissClickEvent = function(){
-              var e = $.Event('hide.bs.modal')
-              that.$element.trigger(e)
-              that.$element.hide();
-              $(document).unbind('click',docClickEvent);
-              dismssers.unbind('click',dismissClickEvent);
-            };
-
-            dismssers.one('click', dismissClickEvent);
-
-            //inject default behaviour to close it
-            that.$element.one('shown.bs.modal',function(){
-              setTimeout(function(){
-                $(document).bind('click',docClickEvent);
-              },0);
-            });
-          }
           callback()
         }
 
@@ -146,6 +116,29 @@
         if (!data) $this.data('modal-popover', (data = new ModalPopover(this, options)))
 
         if (typeof option == 'string') data[option]()
+
+        var docClickEvent = function(event){
+          if($(event.target).parents().index($this) === -1){
+            var e = $.Event('hide.bs.modal');
+            $this.trigger(e);
+            $this.hide();
+            $(document).unbind('click', docClickEvent);
+          }
+        };
+
+        $('[data-dismiss="modal-popup"]').on('click',function(){
+          var e = $.Event('hide.bs.modal');
+          $this.trigger(e);
+          $this.hide();
+          $(document).unbind('click', docClickEvent);
+        });
+
+        $this.one('shown.bs.modal',function(){
+          setTimeout(function(){
+            $(document).on('click', docClickEvent);
+          },0);
+        });
+
       })
     }
 
