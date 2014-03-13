@@ -23,7 +23,7 @@
         getPosition:function () {
             var parentOffset = this.$parent.offset();
             var elementOffset = this.$element.offset();
-            var finalOffset = {'top':(parentOffset.top-elementOffset.top),'left':(parentOffset.left-elementOffset.left)};
+            var finalOffset = {'top':(parentOffset.top-elementOffset.top),'left':this.$parent[0].offsetLeft};
             return $.extend({}, finalOffset, {
                 width:this.$parent[0].offsetWidth, height:this.$parent[0].offsetHeight
             });
